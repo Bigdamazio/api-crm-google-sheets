@@ -1,22 +1,27 @@
 # API de CRM Integrada com Google Sheets
 
-Esta API foi desenvolvida usando Google Apps Script, integrando uma planilha do Google Sheets como backend. Ela oferece funcionalidades para cadastro, consulta e atualização de dados dos clientes via API. A API permite a interação utilizando métodos GET e POST.
+Esta API foi desenvolvida usando Google Apps Script, integrando uma planilha do Google Sheets como backend. Ela oferece funcionalidades para cadastro, consulta e atualização de dados dos clientes via API. A API permite a interação utilizando métodos `GET` e `POST`.
 
-Funcionalidades
-Cadastro de Cliente (POST)
-Consulta de Cliente (GET)
-Atualização de Dados do Cliente (POST)
-Respostas JSON para sucesso e erro
+## Funcionalidades
 
-Pré-requisitos
-Google Sheets: A API utiliza o Google Sheets como banco de dados.
+1. **Cadastro de Cliente (POST)**
+2. **Consulta de Cliente (GET)**
+3. **Atualização de Dados do Cliente (POST)**
+4. **Respostas JSON para sucesso e erro**
 
-Google Apps Script: O código é implementado no ambiente de script do Google.
+## Pré-requisitos
 
-API Key (opcional): Caso queira autenticação adicional, você pode adicionar uma chave de API.
+* **Google Sheets**: A API utiliza o Google Sheets como banco de dados.
+* **Google Apps Script**: O código é implementado no ambiente de script do Google.
+* **API Key (opcional)**: Caso queira autenticação adicional, você pode adicionar uma chave de API.
 
 ## Como Utilizar
+
 ### 1. Função Principal para POST (Cadastro e Verificação de Cliente)
+
+A função `doPost` recebe os dados de um cliente (via JSON) e realiza a verificação para determinar se o cliente já está cadastrado. Caso contrário, o cliente será inserido na planilha.
+
+```javascript
 function doPost(e) {
   try {
     if (!e || !e.postData || !e.postData.contents) {
@@ -56,21 +61,26 @@ function doPost(e) {
 
     return cadastrarNovoCliente(params, numeroCliente);
 
-
   } catch (error) {
     Logger.log("❌ Erro (POST): " + error.message);
     return createErrorResponse("Erro ao processar a requisição", error.message);
   }
 }
+```
 
-##Como Funciona:
-1. O script espera um JSON contendo informações do cliente, como NUMERO_CLIENTES, NOME, EMAIL, etc.
-2. Se o número do cliente (NUMERO_CLIENTES) não for fornecido, o script cadastra um novo cliente.
+#### Como Funciona:
+
+1. O script espera um JSON contendo informações do cliente, como `NUMERO_CLIENTES`, `NOME`, `EMAIL`, etc.
+2. Se o número do cliente (`NUMERO_CLIENTES`) não for fornecido, o script cadastra um novo cliente.
 3. Se o número do cliente for fornecido, ele verifica se o cliente já existe. Caso sim, retorna os dados já cadastrados. Caso contrário, insere um novo cliente.
 
-### 2. Função para Consulta (GET)
-A função doGet consulta os dados de um cliente específico a partir do número de cliente. Os dados são retornados em formato JSON.
+---
 
+### 2. Função para Consulta (GET)
+
+A função `doGet` consulta os dados de um cliente específico a partir do número de cliente. Os dados são retornados em formato JSON.
+
+```javascript
 function doGet(e) {
   try {
     if (!e || !e.parameter || !e.parameter.NUMERO_CLIENTES) {
@@ -107,14 +117,20 @@ function doGet(e) {
     return createErrorResponse("Erro ao processar a requisição", error.message);
   }
 }
+```
 
-Como Funciona:
-1. A requisição GET precisa incluir o número do cliente (NUMERO_CLIENTES) como parâmetro na URL.
+#### Como Funciona:
+
+1. A requisição `GET` precisa incluir o número do cliente (`NUMERO_CLIENTES`) como parâmetro na URL.
 2. O script procura pelo número do cliente na planilha e, caso encontrado, retorna os dados no formato JSON.
 
+---
+
 ### 3. Função para Atualização de Dados (POST)
+
 Esta função permite a atualização de informações de um cliente já cadastrado.
 
+```javascript
 function atualizarDados(params) {
   try {
     Logger.log("🔄 Atualizando cliente: " + JSON.stringify(params));
@@ -154,17 +170,24 @@ function atualizarDados(params) {
     return createErrorResponse("Erro ao atualizar os dados", error.message);
   }
 }
+```
 
+---
 
 ### 4. Funções Auxiliares
-- **findClientRangeByNumber**: Encontra o cliente na planilha com base no número do cliente.
-- **cadastrarNovoCliente**: Insere um novo cliente na planilha.
-- **createJsonResponse**: Retorna uma resposta JSON com os dados fornecidos.
-- **createErrorResponse**: Retorna uma resposta JSON com detalhes do erro.
 
-## Exemplo de Request/Response
+* **findClientRangeByNumber**: Encontra o cliente na planilha com base no número do cliente.
+* **cadastrarNovoCliente**: Insere um novo cliente na planilha.
+* **createJsonResponse**: Retorna uma resposta JSON com os dados fornecidos.
+* **createErrorResponse**: Retorna uma resposta JSON com detalhes do erro.
 
-### Exemplo de POST:
+### Exemplo de Request/Response
+
+#### Exemplo de POST:
+
+**Requisição (POST)**:
+
+```json
 {
   "NUMERO_CLIENTES": "12345",
   "NOME": "Cliente Exemplo",
@@ -176,14 +199,27 @@ function atualizarDados(params) {
   "EMISSOR_NFSE": "Sim",
   "AREA_CLIENTE": "TI"
 }
+```
 
+**Resposta (JSON)**:
+
+```json
 {
   "mensagem": "✅ Cliente cadastrado! Agora preencha os demais dados."
 }
+```
 
-### Exemplo de GET:
+#### Exemplo de GET:
+
+**Requisição (GET)**:
+
+```http
 GET https://script.google.com/macros/s/EXAMPLE_ID/exec?NUMERO_CLIENTES=12345
+```
 
+**Resposta (JSON)**:
+
+```json
 {
   "NUMERO_CLIENTES": "12345",
   "NOME": "Cliente Exemplo",
@@ -195,6 +231,9 @@ GET https://script.google.com/macros/s/EXAMPLE_ID/exec?NUMERO_CLIENTES=12345
   "EMISSOR_NFSE": "Sim",
   "AREA_CLIENTE": "TI"
 }
+```
+
+---
 
 ## Contribuindo
 
